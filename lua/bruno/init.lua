@@ -35,7 +35,7 @@ M.setup = function(opts)
     })
 
     vim.api.nvim_create_autocmd("FileType", {
-        pattern = { "bruno" },
+        pattern = { "bruno", "bru" },
         callback = function()
             setup.sync({ skip_if_installed = true })
         end,
