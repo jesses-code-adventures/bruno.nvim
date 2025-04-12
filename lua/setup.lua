@@ -13,7 +13,6 @@ function M._check_prereq(prereq)
     return true
 end
 
-
 ---@param prereq string
 function M._check_cli_prereq(prereq)
     if not prereq:sub(1, 1) == "!" then
@@ -34,7 +33,6 @@ function M._check_cli_prereq(prereq)
     return true
 end
 
-
 function M._verify_prereqs()
     M._print("verifying prereqs")
     M._check_prereq("nvim-treesitter")
@@ -43,14 +41,12 @@ function M._verify_prereqs()
     M._print("verified prereqs")
 end
 
-
 function M.on_exit(obj)
     M._print(obj.code)
     M._print(obj.signal)
     M._print(obj.stdout)
     M._print(obj.stderr)
 end
-
 
 function M.debug_state()
     local debug = M.debug
@@ -67,62 +63,41 @@ function M.debug_state()
     M.debug = debug
 end
 
-
 function M._sync_repo()
-    ut.Syscall_must_succeed(function() return vim.system({ "mkdir", "-p", M.repo_dir }, {}, M.on_exit):wait() end)
+    ut.Syscall({ "mkdir", "-p", M.repo_dir }, {}, M.on_exit)
     if vim.fn.isdirectory(M.repo_dir .. "/.git") == 0 then
         M._print("cloning " .. M.treesitter_url .. " to " .. M.repo_dir)
-        ut.Syscall_must_succeed(function()
-            return vim.system({ "git", "clone", "--depth", "1", M.treesitter_url, "." },
-                { cwd = M.repo_dir }, M.on_exit):wait()
-        end)
+        ut.Syscall({ "git", "clone", "--depth", "1", M.treesitter_url, "." }, { cwd = M.repo_dir }, M.on_exit)
     else
         M._print("pulling from " .. M.treesitter_url)
-        ut.Syscall_must_succeed(function()
-            return vim.system({ "git", "-C", M.repo_dir, "pull" }, { cwd = M.repo_dir },
-                M.on_exit):wait()
-        end)
+        ut.Syscall({ "git", "-C", M.repo_dir, "pull" }, { cwd = M.repo_dir }, M.on_exit)
     end
     if vim.fn.isdirectory(M.repo_dir .. "/queries") == 0 then
         error("queries directory not found in " .. M.repo_dir)
     end
-    ut.Syscall_must_succeed(function()
-        return vim.system({ "tree-sitter", "generate" }, { cwd = M.repo_dir }, M.on_exit)
-            :wait()
-    end)
-    ut.Syscall_must_succeed(function()
-        return vim.system({ "tree-sitter", "test" }, { cwd = M.repo_dir }, M.on_exit)
-            :wait()
-    end)
+    ut.Syscall({ "tree-sitter", "generate" }, { cwd = M.repo_dir }, M.on_exit)
+    ut.Syscall({ "tree-sitter", "test" }, { cwd = M.repo_dir }, M.on_exit)
 end
-
 
 function M._setup_queries()
     -- TODO: work out how to use a different dir, so the user's config isn't modified
     local target_queries_dir = M.config_dir .. "/after/queries/bruno"
-    ut.Syscall_must_succeed(function()
-        return vim.system({ "mkdir", "-p", target_queries_dir }, {}, M.on_exit):wait()
-    end)
+    ut.Syscall({ "mkdir", "-p", target_queries_dir }, {}, M.on_exit)
     local src_queries_dir = M.repo_dir .. "/queries"
     local files = vim.fn.globpath(src_queries_dir, "*", false, true)
     for _, filepath in ipairs(files) do
-        ut.Syscall_must_succeed(function()
-            return vim.system({ "cp", filepath, target_queries_dir }, {}, M.on_exit):wait()
-        end)
+        ut.Syscall({ "cp", filepath, target_queries_dir }, {}, M.on_exit)
     end
     vim.cmd('runtime! after/**/*.vim')
 end
 
-
 -- clones or updates the bruno repo and syncs queries to a canonical location
 function M._clone_and_sync()
-    M.debug_state()
     M._print("in clone and sync queries")
     M._sync_repo()
     M._setup_queries()
     M._print("finished clone and sync queries")
 end
-
 
 function M._treesitter()
     M._print("setting up treesitter " .. M.language_name .. " parser")
@@ -142,7 +117,6 @@ function M._treesitter()
     vim.treesitter.language.register(M.language_name, M.extension)
     M._print("finished setting up treesitter " .. M.language_name .. " parser")
 end
-
 
 ---@param msg string
 M._print = function(msg)

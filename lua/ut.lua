@@ -1,5 +1,6 @@
 local M = {}
 
+
 ---@param msg string
 ---@param debug boolean
 M.Debug_print = function(msg, debug)
@@ -7,6 +8,7 @@ M.Debug_print = function(msg, debug)
         print(msg)
     end
 end
+
 
 ---@param cb function
 M.Syscall_must_succeed = function(cb)
@@ -16,5 +18,23 @@ M.Syscall_must_succeed = function(cb)
     end
     return r
 end
+
+
+---@param cmd string[]
+---@param opts vim.SystemOpts
+---@param on_exit function
+---@return vim.SystemCompleted
+M.Syscall = function(cmd, opts, on_exit)
+    opts = opts or {}
+    opts.cwd = opts.cwd or nil
+
+    local result = vim.system(cmd, opts, on_exit):wait()
+    if result.code ~= 0 then
+        error(string.format("Command failed: %s (exit code: %d)", table.concat(cmd, " "), result.code))
+    end
+
+    return result
+end
+
 
 return M
