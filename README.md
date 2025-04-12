@@ -17,3 +17,14 @@ return {
     "jesses-code-adventures/bruno.nvim"
 }
 ```
+
+To install using the original `tree-sitter-bruno` grammar, use the following:
+
+```lua
+return {
+    "jesses-code-adventures/bruno.nvim",
+    opts = {
+        _treesitter_repo = "https://github.com/Scalamando/tree-sitter-bruno",
+    }
+}
+```
