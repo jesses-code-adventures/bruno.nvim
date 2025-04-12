@@ -5,6 +5,7 @@ This plugin automates the following process for `.bru` files:
 - Cloning a repo with a treesitter grammar
 - Generating the tree-sitter parser
 - Installing the custom parser in tree-sitter
+- Adding the highlight and injection queries to your `/after/queries/bruno` directory
 
 It only exists as `.bru` files are not supported by the official `nvim-treesitter` plugin.
 
