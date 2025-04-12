@@ -23,4 +23,9 @@ M.sync = function()
 end
 
 
+M.debug_setup = function()
+    require("setup")._debug_state()
+end
+
+
 return M

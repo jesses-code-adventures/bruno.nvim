@@ -53,6 +53,8 @@ end
 
 
 function M._debug_state()
+    local debug = M.debug
+    M.debug = true
     M._print("debug state")
     M._print("plugin_name: " .. M.plugin_name)
     M._print("language_name: " .. M.language_name)
@@ -62,6 +64,7 @@ function M._debug_state()
     M._print("repo_dir: " .. M.repo_dir)
     M._print("treesitter_author: " .. M.treesitter_author)
     M._print("treesitter_url: " .. M.treesitter_url)
+    M.debug = debug
 end
 
 
