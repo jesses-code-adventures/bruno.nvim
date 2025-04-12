@@ -167,9 +167,15 @@ M.run = function(opts)
     M._print("executing run() in debug mode")
     M._init(opts)
     M._verify_prereqs()
+    M._print("finished executing run() in debug mode")
+end
+
+
+M.sync = function()
+    M._print("executing sync() in debug mode")
     M._clone_and_sync()
     M._treesitter()
-    M._print("finished executing run() in debug mode")
+    M._print("finished executing sync() in debug mode")
 end
 
 
