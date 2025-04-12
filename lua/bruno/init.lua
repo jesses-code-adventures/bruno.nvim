@@ -4,6 +4,12 @@
 local M = {}
 local setup = require("bruno.setup")
 
+vim.filetype.add({
+    extension = {
+        bru = "bruno",
+    },
+})
+
 ---@class bruno.setup.opts?
 ---@field _local_treesitter_repo_name string?
 ---@field _treesitter_url string?
@@ -17,15 +23,23 @@ local setup = require("bruno.setup")
 ---@param opts bruno.setup.opts?
 M.setup = function(opts)
     setup.setup(opts or {})
-    setup.sync({ skip_if_installed = true })
 
     vim.api.nvim_create_autocmd("User", {
         pattern = { "TSUpdateSync", "TSUpdate" },
         callback = function(ev)
+            print("in bruno.nvim autocmd from TSUpdate")
             if ev.data == nil or ev.data.lang == "bruno" then
                 setup.sync()
             end
         end
+    })
+
+    vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "bruno" },
+        callback = function()
+            setup.sync({ skip_if_installed = true })
+        end,
+        desc = "bruno.nvim: sync after filetype",
     })
 end
 
