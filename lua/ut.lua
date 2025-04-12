@@ -8,4 +8,13 @@ M.Debug_print = function(msg, debug)
     end
 end
 
+---@param cb function
+M.Syscall_must_succeed = function(cb)
+    local r = cb()
+    if r.code ~= 0 then
+        error("command failed: " .. (r.stderr or "unknown error"))
+    end
+    return r
+end
+
 return M
