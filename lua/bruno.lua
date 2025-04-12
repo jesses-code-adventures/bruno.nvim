@@ -24,7 +24,7 @@ end
 
 
 M.debug_setup = function()
-    require("setup")._debug_state()
+    require("setup").debug_state()
 end
 
 

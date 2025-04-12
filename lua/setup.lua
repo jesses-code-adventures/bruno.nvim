@@ -52,7 +52,7 @@ function M.on_exit(obj)
 end
 
 
-function M._debug_state()
+function M.debug_state()
     local debug = M.debug
     M.debug = true
     M._print("debug state")
@@ -116,7 +116,7 @@ end
 
 -- clones or updates the bruno repo and syncs queries to a canonical location
 function M._clone_and_sync()
-    M._debug_state()
+    M.debug_state()
     M._print("in clone and sync queries")
     M._sync_repo()
     M._setup_queries()
