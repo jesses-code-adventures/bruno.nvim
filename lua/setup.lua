@@ -1,5 +1,4 @@
 local ut = require("ut")
-
 local M = {}
 
 
@@ -12,6 +11,7 @@ function M._check_prereq(prereq)
     end
     return true
 end
+
 
 ---@param prereq string
 function M._check_cli_prereq(prereq)
@@ -33,6 +33,7 @@ function M._check_cli_prereq(prereq)
     return true
 end
 
+
 function M._verify_prereqs()
     M._print("verifying prereqs")
     M._check_prereq("nvim-treesitter")
@@ -41,12 +42,14 @@ function M._verify_prereqs()
     M._print("verified prereqs")
 end
 
+
 function M.on_exit(obj)
     M._print(obj.code)
     M._print(obj.signal)
     M._print(obj.stdout)
     M._print(obj.stderr)
 end
+
 
 function M.debug_state()
     local debug = M.debug
@@ -62,6 +65,7 @@ function M.debug_state()
     M._print("treesitter_url: " .. M.treesitter_url)
     M.debug = debug
 end
+
 
 function M._sync_repo()
     ut.Syscall({ "mkdir", "-p", M.repo_dir }, {}, M.on_exit)
@@ -79,6 +83,7 @@ function M._sync_repo()
     ut.Syscall({ "tree-sitter", "test" }, { cwd = M.repo_dir }, M.on_exit)
 end
 
+
 function M._setup_queries()
     -- TODO: work out how to use a different dir, so the user's config isn't modified
     local target_queries_dir = M.config_dir .. "/after/queries/bruno"
@@ -91,6 +96,7 @@ function M._setup_queries()
     vim.cmd('runtime! after/**/*.vim')
 end
 
+
 -- clones or updates the bruno repo and syncs queries to a canonical location
 function M._clone_and_sync()
     M._print("in clone and sync queries")
@@ -98,6 +104,7 @@ function M._clone_and_sync()
     M._setup_queries()
     M._print("finished clone and sync queries")
 end
+
 
 function M._treesitter()
     M._print("setting up treesitter " .. M.language_name .. " parser")
@@ -117,6 +124,7 @@ function M._treesitter()
     vim.treesitter.language.register(M.language_name, M.extension)
     M._print("finished setting up treesitter " .. M.language_name .. " parser")
 end
+
 
 ---@param msg string
 M._print = function(msg)
