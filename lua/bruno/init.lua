@@ -2,6 +2,7 @@
 -- @author: Jesse Williams
 
 local M = {}
+local has_setup_run = false
 local setup = require("bruno.setup")
 
 vim.filetype.add({
@@ -22,6 +23,7 @@ vim.filetype.add({
 
 ---@param opts bruno.setup.opts?
 M.setup = function(opts)
+    has_setup_run = true
     setup.setup(opts or {})
 
     vim.api.nvim_create_autocmd("User", {
@@ -53,6 +55,11 @@ end
 
 M.teardown = function()
     setup.teardown()
+end
+
+-- auto-run setup with defaults if it's not been set up by the user
+if not has_setup_run then
+  M.setup({})
 end
 
 return M
