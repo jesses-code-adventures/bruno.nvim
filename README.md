@@ -5,7 +5,14 @@ Syntax highlighting and filetype injection for `.bru` files in Neovim using [tre
 ## Installation - Lazy
 
 ```lua
-return { "jesses-code-adventures/bruno.nvim", opts = {}}
+return {
+    "jesses-code-adventures/bruno.nvim",
+    opts = {},
+    keys = {
+        { "<leader>r", function() require("bruno").query_current_file(); end, mode = "n", desc = "Test the current query with the results in a scratch buffer." },
+    },
+    lazy = false,
+}
 ```
 
 To install using the original `tree-sitter-bruno` grammar, use the following:
@@ -15,7 +22,8 @@ return {
     "jesses-code-adventures/bruno.nvim",
     opts = {
         _treesitter_repo = "https://github.com/Scalamando/tree-sitter-bruno",
-    }
+    },
+    lazy = false,
 }
 ```
 
