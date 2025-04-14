@@ -62,7 +62,9 @@ function M.query_file()
 
     M.set_collection_from_query(current_file)
 
-    M._create_response_window()
+    if not M._query_win or not vim.api.nvim_win_is_valid(M._query_win) then
+        M._create_response_window()
+    end
     vim.schedule(function()
         local args = M._cmd_bru_run(current_file)
         M._print("making query from cwd " ..
@@ -89,35 +91,36 @@ M._print = function(msg)
     M.utils.Print(M, msg)
 end
 
---- set the current window and buffer for the query
---- @param buf number
---- @param win number
-function M._set_response_bufwin(buf, win)
-    M._query_buf = buf
-    M._query_win = win
-end
-
 function M._create_response_window()
-    local buf = vim.api.nvim_create_buf(false, true) -- false = listed, true = scratch
-    vim.bo[buf].modifiable = false
-    vim.bo[buf].readonly = true
-    vim.bo[buf].buftype = "nofile"
-    vim.bo[buf].bufhidden = "wipe"
-    vim.bo[buf].swapfile = false
+    if not (M._query_buf and vim.api.nvim_buf_is_valid(M._query_buf)) then
+        local buf = vim.api.nvim_create_buf(false, true) -- false = listed, true = scratch
+        vim.bo[buf].modifiable = false
+        vim.bo[buf].readonly = true
+        vim.bo[buf].buftype = "nofile"
+        vim.bo[buf].bufhidden = "wipe"
+        vim.bo[buf].swapfile = false
+        M._query_buf = buf
+    end
+
     ---@type vim.api.keyset.win_config
     local win_opts = {
         split = "right",
     }
-    local win = vim.api.nvim_open_win(buf, false, win_opts)
-    M._set_response_bufwin(buf, win)
+    local win = vim.api.nvim_open_win(M._query_buf, false, win_opts)
+    vim.wo[win].number = false
+    vim.wo[win].relativenumber = false
+    M._query_win = win
 end
 
-function M._write_to_locked_buffer(buf, lines)
-    vim.bo[buf].modifiable = true
-    vim.bo[buf].readonly = false
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-    vim.bo[buf].readonly = true
-    vim.bo[buf].modifiable = false
+function M._write_to_response_window(lines)
+    if not (M._query_buf and vim.api.nvim_buf_is_valid(M._query_buf)) then
+        return
+    end
+    vim.bo[M._query_buf].modifiable = true
+    vim.bo[M._query_buf].readonly = false
+    vim.api.nvim_buf_set_lines(M._query_buf, 0, -1, false, lines)
+    vim.bo[M._query_buf].readonly = true
+    vim.bo[M._query_buf].modifiable = false
 end
 
 function M._render_response(resp)
@@ -127,7 +130,8 @@ function M._render_response(resp)
         "[FAILED]: Resp code - [" .. resp.code .. "]\n" .. (resp.stderr or "unknown error") .. "\n"
     end
     output_string = output_string .. resp.stdout
-    M._write_to_locked_buffer(M._query_buf, vim.split(output_string, "\n"))
+    M._write_to_response_window({})
+    M._write_to_response_window(vim.split(output_string, "\n"))
 end
 
 function M.get_dbg()
