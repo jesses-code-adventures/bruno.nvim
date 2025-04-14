@@ -1,18 +1,5 @@
 local M = {}
 
----@class bruno.parser.dictionary_block
----@field key string
----@field values bruno.parser.dictionary_entry[]
-
----@class bruno.parser.array_block
----@field key string
----@field values bruno.parser.array_entry[]
-
----@class bruno.parser.text_block
----@field key string
----@field value string
-
-
 ---@class bruno.parser.dictionary_entry
 ---@field key string
 ---@field value string
@@ -99,6 +86,8 @@ local test_data = [[
 ---@param content string[]
 ---@return bruno.parser.bru_file_contents
 function M.parse_bru_content(content)
+    -- TODO: reimplement this using treesitter
+
     ---@type bruno.parser.bru_file_contents
     local result = {}
     local current_block = nil
