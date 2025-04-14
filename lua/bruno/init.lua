@@ -2,7 +2,7 @@
 -- @author: Jesse Williams
 
 local M = {}
-local has_setup_run = false
+local utils = require("bruno.utils")
 local setup = require("bruno.setup")
 
 vim.filetype.add({
@@ -23,13 +23,17 @@ vim.filetype.add({
 
 ---@param opts bruno.setup.opts?
 M.setup = function(opts)
-    has_setup_run = true
+    M.utils = utils
+    M.mod_name = "INIT"
+    M = utils.Setup_module(M, opts)
+
+    M._print("setting up bruno.nvim")
+    M.queries = require("bruno.queries").setup(opts or {})
     setup.setup(opts or {})
 
     vim.api.nvim_create_autocmd("User", {
         pattern = { "TSUpdateSync", "TSUpdate" },
         callback = function(ev)
-            print("in bruno.nvim autocmd from TSUpdate")
             if ev.data == nil or ev.data.lang == "bruno" then
                 setup.sync()
             end
@@ -37,12 +41,18 @@ M.setup = function(opts)
     })
 
     vim.api.nvim_create_autocmd("FileType", {
-        pattern = { "bruno", "bru" },
+        pattern = { "bru" },
         callback = function()
             setup.sync({ skip_if_installed = true })
         end,
         desc = "bruno.nvim: sync after filetype",
     })
+
+    M._print("finished setting up bruno.nvim")
+end
+
+function M.query_current_file()
+    M.queries.query_file()
 end
 
 M.sync = function()
@@ -57,9 +67,12 @@ M.teardown = function()
     setup.teardown()
 end
 
--- auto-run setup with defaults if it's not been set up by the user
-if not has_setup_run then
-  M.setup({})
+function M.get_dbg()
+    return M.dbg
+end
+
+function M._print(msg)
+    M.utils.Print(M, msg)
 end
 
 return M
